@@ -2,11 +2,11 @@ PR-CUSTOM-PROTOCOL
 
 TODO: 
 
-* [ ] Read the docs and update `STEPS
+* [x] Read the docs and update `STEPS
 
-* [ ] Choose the project to be made
+* [x] Choose the project to be made
 
-Choice - `<To be added>`
+Choice - FTP
 
 STEPS:
 
@@ -14,23 +14,24 @@ STEPS:
 
 * [ ] Server side:
 
-    * [ ] Make the library for the server
+    * [x] Make the library for the server
     
-    * [ ] Define the 3 module stack of the library
+    * [x] Define the 3 module stack of the library
     
-    * [ ] Define the API with a layered architecture
+    * [x] Define the API with a layered architecture
     
-* [ ] Client side:
+* [x] Client side:
 
-    * [ ] Make the library for the client
+    * [x] Make the library for the client
     
-    * [ ] Define the 3 module stack of the library
+    * [x] Define the 3 module stack of the library
     
-    * [ ] Define the API with a layered architecture
-    
-    
-Implement a protocol atop UDP, with error checking and retransmissions. Limit the number of retries for retransmission.
+    * [x] Define the API with a layered architecture
 
-Make the connection secure, using CA to get the public key of the receiver and encrypt data or using Diffie-Helman to get a shared connection key between client and server. Ensure that the traffic is encrypted.
+STEPS
+
+* [x] Create UDP socket with basic transmission
+
+* [ ] Add state for 3 handshake
 
 `<Choose the applcation-level protocol>`
