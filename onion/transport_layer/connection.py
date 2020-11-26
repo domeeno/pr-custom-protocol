@@ -5,20 +5,33 @@ from logs.log import default_logger
 from onion.session_security.security import generate_keys
 
 from onion.transport_layer.handshake import HSHAKE_STATUS
+from onion.transport_layer.transmission import validate_recv_data
 
 
-def session(sck, client_address, public_key):
+def session(client_address, client_syn, public_key, sck):
     default_logger.debug('New connection with: {}'.format(client_address))
-    msg, addr = sck.recvfrom(128*1024)
-    print("message: " + msg.decode())
-    while True:
-        msg, addr = sck.recvfrom(128*1024)
-        if msg.decode() == 'exit':
+
+    connection_ip, port = client_address
+    current_ip = connection_ip
+    current_syn = client_syn
+
+    while str(connection_ip) == str(current_ip) and int(client_syn) == int(current_syn):
+        current_syn = current_syn + 1
+        encrypted_msg, addr = sck.recvfrom(128*1024)
+        msg, current_ip, current_syn, is_trusted = validate_recv_data(encrypted_msg, public_key,
+                                                                      connection_ip, current_syn)
+        
+        if not is_trusted:
+            default_logger.warning("Source not trustworthy. Source data: " + current_ip, current_syn)
             break
+        if msg.decode() == 'exit':
+            default_logger.debug('{}'.format(client_address) + ' disconnected')
+            break
+
         default_logger.debug('client message is: {}'.format(msg.decode()))
         sck.sendto('sending request: {}'.format(msg.decode()).encode(), addr)
-    default_logger.debug('{}'.format(client_address) + ' disconnected')
-    client_address.close()
+
+    sck.close()
 
 
 def add_connection(syn, addr, sck):
@@ -31,7 +44,7 @@ def add_connection(syn, addr, sck):
            '"private_key": "%s" }' % (syn.decode(), str(HSHAKE_STATUS.SYN_ACK.value), str(private_key))
 
     sck.sendto(data.encode('UTF-8'), addr)
-    worker = threading.Thread(target=session, args=(sck, addr, public_key))
+    worker = threading.Thread(target=session, args=(addr, syn, public_key, sck))
     workers.append(worker)
 
     for worker in workers:
