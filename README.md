@@ -38,13 +38,18 @@ STEPS
 
 * [x] Test clients working
 
-* [ ] Add security key to encode messages with and decode them
+* [x] Add security key generation to encode messages with and decode them
+
+* [x] Add encrypt and decrypt RSA algorithm
 
 * [ ] Add sending data and receiving data with connection control (SYN INCREMENT)
 
-* [ ] 
+* [ ] Add the encryption and decryption to the protocol
 
-Brief: 
-Now I have to send the encoded messages somehow that the handshake works in theory.
+* [ ] Add data chunkinator at application level
+
+...
+
+* [ ] Reformat code for readability and good practice
 
 `<Choose the applcation-level protocol>`
