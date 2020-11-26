@@ -1,3 +1,4 @@
+import json
 import threading
 import random
 from logs.log import default_logger
@@ -5,24 +6,28 @@ from logs.log import default_logger
 from onion.transport_layer.handshake import HSHAKE_STATUS
 
 
-def session(client_address, connection):
-    default_logger.debug('New connection with: {}'.format(connection))
+def session(sck, client_address):
+    default_logger.debug('New connection with: {}'.format(client_address))
+    msg, addr = sck.recvfrom(128*1024)
+    print("message: " + msg.decode())
     while True:
-        msg = client_address.recvfrom(128*1024)
+        msg, addr = sck.recvfrom(128*1024)
         if msg.decode() == 'exit':
             break
         default_logger.debug('client message is: {}'.format(msg.decode()))
-        client_address.sendall('sending request: {}'.format(msg.decode()).encode())
-    default_logger.debug('{}'.format(connection) + ' disconnected')
+        sck.sendto('sending request: {}'.format(msg.decode()).encode(), addr)
+    default_logger.debug('{}'.format(client_address) + ' disconnected')
     client_address.close()
 
 
 def add_connection(syn, addr, sck):
-    print("I arrived here")
     workers = []
-    data = (syn + ":" + HSHAKE_STATUS.SYN_ACK)
-    sck.sendto(data, addr)
-    worker = threading.Thread(target=session, args=(addr, syn))
+
+    data = '{ "sequence_number": %s, ' \
+           '"status": %s }' % (syn.decode(), str(HSHAKE_STATUS.SYN_ACK.value))
+
+    sck.sendto(data.encode('UTF-8'), addr)
+    worker = threading.Thread(target=session, args=(sck, addr))
     workers.append(worker)
 
     for worker in workers:
@@ -35,17 +40,20 @@ def add_connection(syn, addr, sck):
 # Client
 def init_connection(server_host, server_port, socket):
     client_syn = str(random.randint(1000, 6000))
-    status = HSHAKE_STATUS.SYN
+    status = HSHAKE_STATUS.SYN.value
 
     try:
         socket.sendto(client_syn.encode('utf-8'), (server_host, server_port))
     except Exception as e:
-        default_logger.error("Couldn't connect to the server")
+        default_logger.error("Couldn't connect to the server" + str(e))
+        return client_syn, status
 
-    (server_syn, status) = socket.recvfrom(128*1024)
-
-    if server_syn == client_syn:
-        status = HSHAKE_STATUS.ACK
+    data, addr = socket.recvfrom(128*1024)
+    data = data.decode()
+    recv = json.loads(data)
+    print(str(recv['sequence_number']) + " : " + str(client_syn))
+    if int(recv['sequence_number']) == int(client_syn):
+        status = HSHAKE_STATUS.ACK.value
     return client_syn, status
 
 

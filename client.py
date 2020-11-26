@@ -15,14 +15,15 @@ default_logger.debug('Connecting to server: {}:{}'.format(args.host, args.port))
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
     # Try to establish connection
     (synchronize_sequence_number, status) = init_connection(args.host, args.port, sock)
-
-    if status != HSHAKE_STATUS.ACK:
+    print("status = " + str(status))
+    print("HSHAKEValue = " + str(HSHAKE_STATUS.ACK.value))
+    if status != HSHAKE_STATUS.ACK.value:
         sock.close()
-        default_logger.debug("Client not Acknowledged: " + status)
+        default_logger.debug("Client not Acknowledged: " + str(status))
 
-    while status == HSHAKE_STATUS.ACK:
+    while status == HSHAKE_STATUS.ACK.value:
         msg = input()
-        (synchronize_sequence_number, ack) = send_data(args.host, args.port, sock, synchronize_sequence_number)
+        # (synchronize_sequence_number, ack) = send_data(args.host, args.port, sock, synchronize_sequence_number)
         sock.sendto(msg.encode('utf-8'), (args.host, args.port))
         if msg == 'exit':
             default_logger.debug('Disconnected.')
