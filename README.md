@@ -24,11 +24,15 @@ STEPS
 
 * [x] Add message format for now JSON
 
+* [x] Add handshake to each message
+
+* [x] Test transmission protocol (encryption, handshakes, plausible exploits).
+
+* [ ] Add request type to the message (GET PUT DELETE  etc.)
+
+* [ ] Make the encryption smarter
+
 * [ ] Add data chunkinator at application level
-
-* [ ] Add handshake to each message
-
-* [ ] Test transmission protocol (encryption, handshakes, plausible exploits).
 
 ...
 

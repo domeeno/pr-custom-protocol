@@ -10,14 +10,19 @@ def send_data(addr, socket, syn, private_key):
     incremented_syn = int(syn) + 1
     msg = input()
     data = message_structure(addr, incremented_syn, HSHAKE_STATUS.ACK.value, msg)
-    socket.sendto(encrypt(private_key, data).encode('UTF-8'), addr)
+    encrypted_data = str(encrypt(private_key, data)).strip()
+    socket.sendto(encrypted_data.encode('UTF-8'), addr)
+    return incremented_syn, HSHAKE_STATUS.ACK.value
 
 
 def validate_recv_data(data_to_decrypt, public_key, trusted_ip, expected_syn):
-    decrypted_data = decrypt(data_to_decrypt, public_key)
+    data_to_decrypt = list(eval(data_to_decrypt))
+
+    decrypted_data = decrypt(public_key, data_to_decrypt)
     data = json.loads(decrypted_data)
 
-    if data["source_ip"] != trusted_ip or data["syn"] != expected_syn or data["ack"] != HSHAKE_STATUS.ACK.value:
+    if str(data["source_ip"]) != str(trusted_ip) or int(data["syn"]) != int(expected_syn) or \
+            int(data["ack"]) != HSHAKE_STATUS.ACK.value:
         return "error", data["source_ip"], data["syn"], False
     else:
         return data["message"], data["source_ip"], data["syn"], True

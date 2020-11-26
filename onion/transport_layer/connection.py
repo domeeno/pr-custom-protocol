@@ -16,32 +16,35 @@ def session(client_address, client_syn, public_key, sck):
     current_syn = client_syn
 
     while str(connection_ip) == str(current_ip) and int(client_syn) == int(current_syn):
-        current_syn = current_syn + 1
+        current_syn = int(current_syn) + 1
         encrypted_msg, addr = sck.recvfrom(128*1024)
-        msg, current_ip, current_syn, is_trusted = validate_recv_data(encrypted_msg, public_key,
-                                                                      connection_ip, current_syn)
+        msg, current_ip, client_syn, is_trusted = validate_recv_data(encrypted_msg.decode(), public_key,
+                                                                      current_ip, current_syn)
         
         if not is_trusted:
             default_logger.warning("Source not trustworthy. Source data: " + current_ip, current_syn)
             break
-        if msg.decode() == 'exit':
+        else:
+            client_syn = current_syn
+
+        if msg == 'exit':
             default_logger.debug('{}'.format(client_address) + ' disconnected')
             break
 
-        default_logger.debug('client message is: {}'.format(msg.decode()))
-        sck.sendto('sending request: {}'.format(msg.decode()).encode(), addr)
+        default_logger.debug('client message is: {}'.format(msg))
+        sck.sendto('sending request: {}'.format(msg).encode(), addr)
 
     sck.close()
 
 
 def add_connection(syn, addr, sck):
     workers = []
-
+    syn = syn.decode()
     public_key, private_key = generate_keys()
 
     data = '{ "sequence_number": %s, ' \
            '"status": %s,' \
-           '"private_key": "%s" }' % (syn.decode(), str(HSHAKE_STATUS.SYN_ACK.value), str(private_key))
+           '"private_key": "%s" }' % (syn, str(HSHAKE_STATUS.SYN_ACK.value), str(private_key))
 
     sck.sendto(data.encode('UTF-8'), addr)
     worker = threading.Thread(target=session, args=(addr, syn, public_key, sck))
