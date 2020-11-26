@@ -2,6 +2,7 @@ import socket
 import argparse
 
 from logs.log import default_logger
+from onion.transport_layer.connection import add_connection
 
 parser = argparse.ArgumentParser(description="Server")
 parser.add_argument('--host', metavar='host', type=str, nargs='?', default=socket.gethostname())
@@ -22,8 +23,8 @@ except Exception as e:
 
 while True:
     try:
-        (data, addr) = sck.recvfrom(128*1024)
-        print(data.decode())
+        (syn, addr) = sck.recvfrom(128*1024)
+        add_connection(syn=syn, addr=addr, sck=sck)
     except KeyboardInterrupt as e:
         default_logger.debug('Shutting down server')
     except Exception as e:

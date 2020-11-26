@@ -32,6 +32,13 @@ STEPS
 
 * [x] Create UDP socket with basic transmission
 
-* [ ] Add state for 3 handshake
+* [x] Add state for 3 handshake to client
+
+* [x] Connect client after 3 handshake.
+
+* [ ] Test clients working
+
+Brief: 
+Now I have to send the encoded messages somehow that the handshake works in theory.
 
 `<Choose the applcation-level protocol>`
