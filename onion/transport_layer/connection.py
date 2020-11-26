@@ -55,8 +55,3 @@ def init_connection(server_host, server_port, socket):
     if int(recv['sequence_number']) == int(client_syn):
         status = HSHAKE_STATUS.ACK.value
     return client_syn, status
-
-
-# Client
-def send_data(server_host, server_port, socket, syn):
-    pass

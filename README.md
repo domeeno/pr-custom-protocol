@@ -36,7 +36,13 @@ STEPS
 
 * [x] Connect client after 3 handshake.
 
-* [ ] Test clients working
+* [x] Test clients working
+
+* [ ] Add security key to encode messages with and decode them
+
+* [ ] Add sending data and receiving data with connection control (SYN INCREMENT)
+
+* [ ] 
 
 Brief: 
 Now I have to send the encoded messages somehow that the handshake works in theory.
