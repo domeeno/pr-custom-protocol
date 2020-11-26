@@ -3,15 +3,11 @@ import random
 from onion.session_security.security_utils import gcd, get_mult_inverse
 
 
-def generate_p():
-    return 163
+def generate_keys():
+    # To change
+    p = 163
+    q = 311
 
-
-def generate_q():
-    return 311
-
-
-def generate_keys(p, q):
     n = p*q
     phi = (p-1)*(q-1)
 
@@ -39,12 +35,11 @@ def decrypt(public_key, message_to_decrypt):
     decrypted_message = [chr(pow(char, key) % n) for char in message_to_decrypt]
     return ''.join(decrypted_message)
 
-
+# TODO Modify
+# def generate_p():
+#     return 163
+#
+#
+# def generate_q():
+#     return 311
 # quick test
-pa = generate_p()
-qa = generate_q()
-
-public_key, private_key = generate_keys(pa, qa)
-
-cypher = encrypt(private_key, "Hello!!!")
-print(decrypt(public_key=public_key, message_to_decrypt=cypher))

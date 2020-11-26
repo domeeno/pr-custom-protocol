@@ -2,11 +2,12 @@ import json
 import threading
 import random
 from logs.log import default_logger
+from onion.session_security.security import generate_keys
 
 from onion.transport_layer.handshake import HSHAKE_STATUS
 
 
-def session(sck, client_address):
+def session(sck, client_address, public_key):
     default_logger.debug('New connection with: {}'.format(client_address))
     msg, addr = sck.recvfrom(128*1024)
     print("message: " + msg.decode())
@@ -23,11 +24,14 @@ def session(sck, client_address):
 def add_connection(syn, addr, sck):
     workers = []
 
+    public_key, private_key = generate_keys()
+
     data = '{ "sequence_number": %s, ' \
-           '"status": %s }' % (syn.decode(), str(HSHAKE_STATUS.SYN_ACK.value))
+           '"status": %s,' \
+           '"private_key": "%s" }' % (syn.decode(), str(HSHAKE_STATUS.SYN_ACK.value), str(private_key))
 
     sck.sendto(data.encode('UTF-8'), addr)
-    worker = threading.Thread(target=session, args=(sck, addr))
+    worker = threading.Thread(target=session, args=(sck, addr, public_key))
     workers.append(worker)
 
     for worker in workers:
@@ -49,9 +53,10 @@ def init_connection(server_host, server_port, socket):
         return client_syn, status
 
     data, addr = socket.recvfrom(128*1024)
+    print(data)
     data = data.decode()
     recv = json.loads(data)
     print(str(recv['sequence_number']) + " : " + str(client_syn))
     if int(recv['sequence_number']) == int(client_syn):
         status = HSHAKE_STATUS.ACK.value
-    return client_syn, status
+    return client_syn, status, addr, recv['private_key']

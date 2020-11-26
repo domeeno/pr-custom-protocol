@@ -46,6 +46,8 @@ STEPS
 
 * [ ] Add the encryption and decryption to the protocol
 
+* [x] Add message format for now JSON
+
 * [ ] Add data chunkinator at application level
 
 ...
