@@ -34,6 +34,18 @@ STEPS
 
 * [ ] Add data chunkinator at application level
 
+* [ ] Add to state NAK for not acknowledged
+
+* [ ] Add error checking after dividing into chunks with chunkinator
+
+* [ ] Reorganize JSON or data for greater verbosity
+
+* [ ] *Optional: switch to a higher level Server
+
+* [ ] Update how I log everything
+
+Brief. I began to add Request types, need to finish with those. After I will just follow the list of steps
+
 ...
 
 * [ ] Reformat code for readability and good practice

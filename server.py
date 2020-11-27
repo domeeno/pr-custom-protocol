@@ -13,6 +13,9 @@ args = parser.parse_args()
 sck = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
+# A really dumb storage
+pretty_idiotic_storage = {}
+
 try:
     sck.bind((args.host, args.port))
     default_logger.debug(f"Running server on: {args.host}:{args.port}")
@@ -29,3 +32,4 @@ while True:
         default_logger.debug('Shutting down server')
     except Exception as e:
         default_logger.debug(e)
+
