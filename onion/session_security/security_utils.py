@@ -1,3 +1,22 @@
+import random
+import string
+
+
+def rand_str(chars=string.ascii_uppercase + string.digits + string.ascii_lowercase, n=7):
+    return ''.join(random.choice(chars) for _ in range(n))
+
+
+def gen_primes(low, up):
+    primes = [i for i in range(low, up) if is_prime(i)]
+    return random.choice(primes)
+
+
+def is_prime(x):
+    count = 0
+    for i in range(int(x/2)):
+        if x % (i+1) == 0:
+            count = count+1
+    return count == 1
 
 
 # Greatest common denominator

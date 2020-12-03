@@ -2,8 +2,9 @@ import socket
 import argparse
 
 from logs.log import default_logger
-from onion.application_level.client_interface import client_intro
-from onion.transport_layer.handshake import HSHAKE_STATUS
+from onion.application_level.atm import run_transaction
+from onion.session_security.tls import tls_authenticate, tls_client_authenticate
+from onion.transport_layer.enums.handshake import HSHAKE_STATUS
 from onion.transport_layer.connection import init_connection
 from onion.transport_layer.transmission import send_data
 
@@ -16,17 +17,13 @@ default_logger.debug('Connecting to server: {}:{}'.format(args.host, args.port))
 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
     # Try to establish connection
-    (synchronize_sequence_number, status, addr, private_key_holder) = init_connection(args.host, args.port, sock)
-
+    (synchronize_sequence_number, status, addr) = init_connection(args.host, args.port, sock)
     if status != HSHAKE_STATUS.ACK.value:
         sock.close()
         default_logger.debug("Client not Acknowledged: " + str(status))
     default_logger.info("Client connected to server.")
 
-    private_key = list(eval(private_key_holder))
+    is_authenticated, certificate, private_key = tls_client_authenticate(addr, sock)
 
-    while status == HSHAKE_STATUS.ACK.value:
-        client_intro()
-        (synchronize_sequence_number, ack) = send_data(addr, sock, synchronize_sequence_number, private_key)
-        (data, addr) = sock.recvfrom(128 * 1024)
-        print(data.decode())
+    while status == HSHAKE_STATUS.ACK.value and is_authenticated:
+        run_transaction(addr, sock, synchronize_sequence_number, private_key, certificate)

@@ -14,7 +14,11 @@ sck = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # A really dumb storage
-pretty_idiotic_storage = {}
+pretty_idiotic_storage = {
+    "clients": {"card1": {"pin": 3213, "balance": 1203.78},
+                "card2": {"pin": 1111, "balance": 3212.32}
+                }
+}
 
 try:
     sck.bind((args.host, args.port))
@@ -26,10 +30,8 @@ except Exception as e:
 
 while True:
     try:
-        (syn, addr) = sck.recvfrom(128*1024)
-        add_connection(syn=syn, addr=addr, sck=sck)
+        add_connection(sck=sck)
     except KeyboardInterrupt as e:
         default_logger.debug('Shutting down server')
     except Exception as e:
         default_logger.debug(e)
-

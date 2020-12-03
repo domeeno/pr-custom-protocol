@@ -40,11 +40,13 @@ STEPS
 
 * [ ] Reorganize JSON or data for greater verbosity
 
-* [ ] *Optional: switch to a higher level Server
+* [x] *Optional: switch to a higher level Server
+
+* [ ] Add priority I/O multiplexing to the server loop (select or poll or other)
 
 * [ ] Update how I log everything
 
-Brief. I began to add Request types, need to finish with those. After I will just follow the list of steps
+Add tls
 
 ...
 
