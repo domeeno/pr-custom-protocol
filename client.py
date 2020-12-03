@@ -26,4 +26,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
     is_authenticated, certificate, private_key = tls_client_authenticate(addr, sock)
 
     while status == HSHAKE_STATUS.ACK.value and is_authenticated:
-        run_transaction(addr, sock, synchronize_sequence_number, private_key, certificate)
+        is_authenticated = run_transaction(addr, sock, synchronize_sequence_number, private_key, certificate)

@@ -13,13 +13,6 @@ args = parser.parse_args()
 sck = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-# A really dumb storage
-pretty_idiotic_storage = {
-    "clients": {"card1": {"pin": 3213, "balance": 1203.78},
-                "card2": {"pin": 1111, "balance": 3212.32}
-                }
-}
-
 try:
     sck.bind((args.host, args.port))
     default_logger.debug(f"Running server on: {args.host}:{args.port}")

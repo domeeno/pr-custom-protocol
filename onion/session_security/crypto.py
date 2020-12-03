@@ -5,8 +5,8 @@ from onion.session_security.security_utils import gcd, get_mult_inverse, gen_pri
 
 def generate_keys():
     # To change
-    p = gen_primes(100, 300)
-    q = gen_primes(300, 500)
+    p = gen_primes(100, 200)
+    q = gen_primes(200, 300)
 
     n = p*q
     phi = (p-1)*(q-1)

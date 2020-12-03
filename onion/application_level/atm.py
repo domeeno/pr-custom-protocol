@@ -1,24 +1,24 @@
 from logs.log import default_logger
 from onion.transport_layer.enums.client_states import CLIENT_STATE, REQUEST_TYPE
-from onion.transport_layer.transmission import send_data, make_requests
+from onion.transport_layer.transmission import send_data
 
 
 def run_transaction(addr, sock, synchronize_sequence_number, private_key, certificate):
+    state = CLIENT_STATE.IDLE
     print("Insert Card")
     client = "card1"
-    state = CLIENT_STATE.CARD_INSERTED.value
+    state = CLIENT_STATE.CARD_INSERTED
     print("Card inserted")
-    state = CLIENT_STATE(state + 1)
+    state = CLIENT_STATE.REQ_PIN
     while state == CLIENT_STATE.REQ_PIN:
         for i in range(3):
             print("Insert pin:")
             msg = input()
-            (synchronize_sequence_number, ack, state) = send_data(addr, client, sock, synchronize_sequence_number,
-                                                                  private_key, certificate, state.value, msg)
+            synchronize_sequence_number, ack, state = send_data(addr, client, sock, synchronize_sequence_number,
+                                                                private_key, certificate, state.value, msg)
 
             state, addr = sock.recvfrom(128 * 1024)
-
-            if state == str(CLIENT_STATE.SUCCESS_PIN.value):
+            if state.decode() == 'CLIENT_STATE.SUCCESS_PIN':
                 state = CLIENT_STATE.SUCCESS_PIN
                 break
             else:
@@ -32,19 +32,28 @@ def run_transaction(addr, sock, synchronize_sequence_number, private_key, certif
 
     data, addr = sock.recvfrom(128 * 1024)
     default_logger.info(data.decode())
-
+    state = CLIENT_STATE.ON_CLIENT_SESSION.value
     # MAKE TRANSACTIONS WHILE SIGNED IN WITH CARD AND PIN
-    while state == str(CLIENT_STATE.ON_CLIENT_SESSION.value):
+    while state == CLIENT_STATE.ON_CLIENT_SESSION.value:
+        print("1 - GET BALANCE, 2 - WITHDRAW, 3 - DEPOSIT")
         request = input()
-        if str(request) == str(REQUEST_TYPE.BALANCE.value):
+        request = (int(request), )
+        if request == REQUEST_TYPE.BALANCE.value:
             (synchronize_sequence_number, ack, state) = send_data(addr, client, sock, synchronize_sequence_number,
-                                                                  private_key, certificate, CLIENT_STATE.ON_CLIENT_SESSION.value,
+                                                                  private_key, certificate,
+                                                                  CLIENT_STATE.ON_CLIENT_SESSION.value,
                                                                   "", request)
         else:
+            print("AMOUNT:")
             amount = input()
             (synchronize_sequence_number, ack, state) = send_data(addr, client, sock, synchronize_sequence_number,
-                                                                  private_key, certificate, CLIENT_STATE.ON_CLIENT_SESSION.value,
+                                                                  private_key, certificate,
+                                                                  CLIENT_STATE.ON_CLIENT_SESSION.value,
                                                                   amount, request)
 
-        feedback, addr = sock.recvfrom(128*1024)
+        feedback, addr = sock.recvfrom(128 * 1024)
+
+        if feedback == "exit":
+            return False
+
         default_logger.info("Balance: " + feedback.decode())

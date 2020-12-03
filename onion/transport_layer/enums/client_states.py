@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class CLIENT_STATE(Enum):
+    IDLE = 0,
     CARD_INSERTED = 1,
     REQ_PIN = 2,
     ERROR_PIN = 3,
@@ -14,4 +15,4 @@ class REQUEST_TYPE(Enum):
     NO_REQUEST = 0,
     BALANCE = 1,
     WITHDRAW = 2,
-    DEPOSIT = 3
+    DEPOSIT = 3,

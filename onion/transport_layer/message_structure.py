@@ -1,5 +1,5 @@
 
-def message_structure(addr, client, syn, ack, state, message, certificate, req=4):
+def message_structure(addr, client, syn, ack, state, message, certificate, req=0):
     ip, server_port = addr
     data = '''
             {

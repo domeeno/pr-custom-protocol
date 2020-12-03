@@ -13,6 +13,8 @@ def session(client_address, client_syn, sck):
     connection_ip, port = client_address
     current_ip = connection_ip
     current_syn = client_syn
+    first_transaction = True
+    transaction_session = False
 
     while str(connection_ip) == str(current_ip) and int(client_syn) == int(current_syn) and is_verified:
         current_syn = int(current_syn) + 1
@@ -24,10 +26,11 @@ def session(client_address, client_syn, sck):
             default_logger.warning("Source not trustworthy. Source data: " + current_ip, current_syn)
             break
 
-        msg, client, current_ip, client_syn, is_trusted, client_state, request_type = \
+        msg, client, current_ip, client_syn, is_trusted, client_state, request_type =\
             validate_recv_data(encrypted_msg.decode(), public_key, current_ip, current_syn)
 
-        sck.sendto(str(CLIENT_STATE(client_state)).encode, client_address)
+        if first_transaction:
+            sck.sendto(str(CLIENT_STATE(client_state)).encode(), client_address)
 
         if client_state == CLIENT_STATE.CLIENT_NOT_FOUND.value:
             default_logger("Card {} not found".format(client))
@@ -45,16 +48,17 @@ def session(client_address, client_syn, sck):
         else:
             client_syn = current_syn
 
-        if client_state == CLIENT_STATE.SUCCESS_PIN.value:
-            sck.sendto("Pin correct".encode(), client_address)
+        if client_state == CLIENT_STATE.SUCCESS_PIN.value and first_transaction:
+            sck.sendto("Pin success".encode(), client_address)
+            first_transaction = False
+            transaction_session = True
 
         if msg == 'exit':
             default_logger.debug('{}'.format(client_address) + ' disconnected')
             break
 
-        if client_state == CLIENT_STATE.ON_CLIENT_SESSION.value:
+        if transaction_session:
             response = complete_request(request_type, client, msg)
-            sck.sendto(response.encode(), client_address)
-
-        default_logger.debug('client message is: {}'.format(msg))
-        sck.sendto('sending request: {}'.format(msg).encode(), addr)
+            if response is not None:
+                sck.sendto(str(response).encode(), client_address)
+                default_logger.debug('client received the response: {}'.format(response))
