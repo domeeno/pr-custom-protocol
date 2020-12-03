@@ -7,8 +7,9 @@ How to use:
     2. The pin for the card1 is 3213
     3. You will be provided with a list with transaction types, choose one and depending on the type you will be prompted also with the amount.
 
-*requirements.txt added but I don't remember installing any unprovided by python modules.
-*TODO and Behind the scenes was for smoother development, I didn't put effort or in depth descriptions there.
+`requirements.txt added but I don't remember installing any unprovided by python modules.
+TODO and Behind the scenes was for smoother development, I didn't put effort or in depth descriptions there.
+Code is fragile with inputs, to be improved later with input validation and feedback.`
 
 ### Behind scenes
 TODO: 
